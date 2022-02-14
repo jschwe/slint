@@ -109,6 +109,21 @@ impl Texture {
                     return None;
                 }
             }
+            ImageInner::OpenGLTexture { texture, size } => {
+                let glow_texture = unsafe { glow::Context::create_texture_from_gl_name(*texture) };
+                canvas
+                    .borrow_mut()
+                    .create_image_from_native_texture(
+                        glow_texture,
+                        femtovg::ImageInfo::new(
+                            image_flags,
+                            size.width as _,
+                            size.height as _,
+                            femtovg::PixelFormat::Rgba8,
+                        ),
+                    )
+                    .unwrap()
+            }
             _ => {
                 let buffer = image.render_to_buffer(target_size_for_scalable_source)?;
                 let (image_source, flags) = image_buffer_to_image_source(&buffer);

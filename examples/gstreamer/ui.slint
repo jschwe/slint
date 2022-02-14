@@ -1,0 +1,15 @@
+// Copyright © SixtyFPS GmbH <info@slint-ui.com>
+// SPDX-License-Identifier: GPL-3.0-only OR LicenseRef-Slint-commercial
+
+MainWindow := Window {
+    preferred-width: 500px;
+    preferred-height: 600px;
+    title: "GStreamer Video Example";
+    icon: @image-url("../../logo/slint-logo-small-light-128x128.png");
+    property <image> texture <=> img.source;
+
+    img := Image {
+        width: 320px;
+        height: 200px;
+    }
+}
