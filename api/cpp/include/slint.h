@@ -213,8 +213,8 @@ public:
     inline std::optional<SharedString> register_font_from_data(const uint8_t *data, std::size_t len)
     {
         SharedString maybe_err;
-        cbindgen_private::slint_register_font_from_data(&inner, { const_cast<uint8_t *>(data), len },
-                                                        &maybe_err);
+        cbindgen_private::slint_register_font_from_data(
+                &inner, { const_cast<uint8_t *>(data), len }, &maybe_err);
         if (!maybe_err.empty()) {
             return maybe_err;
         } else {
@@ -222,7 +222,10 @@ public:
         }
     }
 
-
+    void *window_system_resource(WindowSystemResource resource)
+    {
+        return cbindgen_private::slint_windowrc_window_system_resource(&inner, resource);
+    }
 
 private:
     cbindgen_private::WindowRcOpaque inner;
