@@ -18,20 +18,24 @@ struct RenderState {
     alpha: f32,
 }
 
-pub struct SkiaRenderer<'a> {
+pub struct SkiaRenderer<'a, RenderSurface: super::Surface> {
     pub canvas: &'a mut skia_safe::Canvas,
     pub scale_factor: f32,
+    pub surface: &'a RenderSurface,
     pub window: &'a i_slint_core::api::Window,
+    pub context: &'a mut skia_safe::gpu::DirectContext,
     state_stack: Vec<RenderState>,
     current_state: RenderState,
     image_cache: &'a ItemCache<Option<skia_safe::Image>>,
     box_shadow_cache: &'a mut SkiaBoxShadowCache,
 }
 
-impl<'a> SkiaRenderer<'a> {
+impl<'a, RenderSurface: super::Surface> SkiaRenderer<'a, RenderSurface> {
     pub fn new(
         canvas: &'a mut skia_safe::Canvas,
         window: &'a i_slint_core::api::Window,
+        surface: &'a RenderSurface,
+        context: &'a mut skia_safe::gpu::DirectContext,
         image_cache: &'a ItemCache<Option<skia_safe::Image>>,
         box_shadow_cache: &'a mut SkiaBoxShadowCache,
     ) -> Self {
@@ -39,6 +43,8 @@ impl<'a> SkiaRenderer<'a> {
             canvas,
             scale_factor: window.scale_factor(),
             window,
+            context,
+            surface,
             state_stack: vec![],
             current_state: RenderState { alpha: 1.0 },
             image_cache,
@@ -135,15 +141,19 @@ impl<'a> SkiaRenderer<'a> {
         // TODO: avoid doing creating an SkImage multiple times when the same source is used in multiple image elements
         let skia_image = self.image_cache.get_or_update_cache_entry(item_rc, || {
             let image = source_property.get();
-            super::cached_image::as_skia_image(image, target_width, target_height).and_then(
-                |skia_image| match colorize_property
-                    .map(|p| p.get())
-                    .filter(|c| !c.is_transparent())
-                {
+            super::cached_image::as_skia_image(
+                image,
+                target_width,
+                target_height,
+                self.surface,
+                self.context,
+            )
+            .and_then(|skia_image| {
+                match colorize_property.map(|p| p.get()).filter(|c| !c.is_transparent()) {
                     Some(color) => self.colorize_image(skia_image, color),
                     None => Some(skia_image),
-                },
-            )
+                }
+            })
         });
 
         let skia_image = match skia_image {
@@ -221,8 +231,14 @@ impl<'a> SkiaRenderer<'a> {
             let canvas = surface.canvas();
             canvas.clear(skia_safe::Color::TRANSPARENT);
 
-            let mut sub_renderer =
-                SkiaRenderer::new(canvas, &self.window, self.image_cache, self.box_shadow_cache);
+            let mut sub_renderer = SkiaRenderer::new(
+                canvas,
+                &self.window,
+                self.surface,
+                self.context,
+                self.image_cache,
+                self.box_shadow_cache,
+            );
 
             i_slint_core::item_rendering::render_item_children(
                 &mut sub_renderer,
@@ -235,7 +251,7 @@ impl<'a> SkiaRenderer<'a> {
     }
 }
 
-impl<'a> ItemRenderer for SkiaRenderer<'a> {
+impl<'a, RenderSurface: super::Surface> ItemRenderer for SkiaRenderer<'a, RenderSurface> {
     fn draw_rectangle(
         &mut self,
         rect: std::pin::Pin<&i_slint_core::items::Rectangle>,

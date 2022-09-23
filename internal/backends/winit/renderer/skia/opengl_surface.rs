@@ -111,6 +111,27 @@ impl super::Surface for OpenGLSurface {
         let pixel_format = self.opengl_context.glutin_context().get_pixel_format();
         pixel_format.color_bits + pixel_format.alpha_bits
     }
+
+    fn create_backend_texture_from_image(
+        &self,
+        image: &i_slint_core::graphics::ImageInner,
+    ) -> Option<skia_safe::gpu::BackendTexture> {
+        let (texture, size) = match image {
+            i_slint_core::ImageInner::OpenGLTexture { texture, size } => (texture, size),
+            _ => return None,
+        };
+        unsafe {
+            Some(skia_safe::gpu::BackendTexture::new_gl(
+                (size.width as _, size.height as _),
+                skia_safe::gpu::MipMapped::No,
+                skia_safe::gpu::gl::TextureInfo {
+                    target: glow::TEXTURE_2D,
+                    id: *texture,
+                    format: glow::RGBA,
+                },
+            ))
+        }
+    }
 }
 
 impl OpenGLSurface {

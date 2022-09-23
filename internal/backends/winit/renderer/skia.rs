@@ -105,6 +105,8 @@ impl super::WinitCompatibleRenderer for SkiaRenderer {
                 let mut item_renderer = itemrenderer::SkiaRenderer::new(
                     skia_canvas,
                     window_adapter.window(),
+                    &canvas.surface,
+                    gr_context,
                     &canvas.image_cache,
                     &mut box_shadow_cache,
                 );
@@ -325,6 +327,12 @@ pub trait Surface {
     );
     fn resize_event(&self);
     fn bits_per_pixel(&self) -> u8;
+    fn create_backend_texture_from_image(
+        &self,
+        image: &i_slint_core::graphics::ImageInner,
+    ) -> Option<skia_safe::gpu::BackendTexture> {
+        None
+    }
 }
 
 pub struct SkiaCanvas<SurfaceType: Surface> {
