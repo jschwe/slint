@@ -110,7 +110,6 @@ pub fn use_modules() -> usize {
             + sharedvector::ffi::slint_shared_vector_empty as usize
             + layout::ffi::slint_solve_grid_layout as usize
             + item_tree::ffi::slint_visit_item_tree as usize
-            + graphics::ffi::slint_new_path_elements as usize
             + properties::ffi::slint_property_init as usize
             + string::ffi::slint_shared_string_bytes as usize
             + window::ffi::slint_windowrc_drop as usize
@@ -118,6 +117,16 @@ pub fn use_modules() -> usize {
             + timers::ffi::slint_timer_start as usize
             + graphics::color::ffi::slint_color_brighter as usize
             + graphics::image::ffi::slint_image_size as usize
+            + {
+                #[cfg(feature = "std")]
+                {
+                    graphics::ffi::slint_new_path_elements as usize
+                }
+                #[cfg(not(feature = "std"))]
+                {
+                    0
+                }
+            }
     }
     #[cfg(not(feature = "ffi"))]
     {

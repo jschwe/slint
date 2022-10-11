@@ -507,8 +507,47 @@ pub fn generate(doc: &Document) -> impl std::fmt::Display {
                         init: Some(init),
                     })
                 }
-                crate::embedded_resources::EmbeddedResourcesKind::TextureData(_) => todo!(),
-                crate::embedded_resources::EmbeddedResourcesKind::BitmapFontData(_) => todo!(),
+                crate::embedded_resources::EmbeddedResourcesKind::TextureData(crate::embedded_resources::Texture {
+                    data, format, rect,
+                    total_size: crate::embedded_resources::Size{width, height},
+                    original_size: crate::embedded_resources::Size{width: unscaled_width, height: unscaled_height},
+                }) => {
+                    let (r_x, r_y, r_w, r_h) = (rect.x(), rect.y(), rect.width(), rect.height());
+                    let color = if let crate::embedded_resources::PixelFormat::AlphaMap([r, g, b]) = format {
+                        format!("slint::Color::from_rgb_u8({r}, {g}, {b})")
+                    } else {
+                        "slint::Color{}".to_string()
+                    };
+                    let count = data.len();
+                    let data = data.iter().map(ToString::to_string).join(", ");
+                    let init = format!("slint::cbindgen_private::types::StaticTextures {{
+                        .size = {{ {width}, {height} }},
+                        .original_size = {{ {unscaled_width}, {unscaled_height} }},
+                        .data = slint::cbindgen_private::Slice<uint8_t>{{ std::array<uint8_t, {count}>{{ {data} }}.data() , {count} }},
+                        .textures = slint::cbindgen_private::Slice<slint::cbindgen_private::types::StaticTexture>{{ std::array<slint::cbindgen_private::types::StaticTexture, 1>{{ slint::cbindgen_private::types::StaticTexture {{
+                            .rect = {{ {r_x}, {r_y}, {r_w}, {r_h} }},
+                            .format = slint::cbindgen_private::types::PixelFormat::{format},
+                            .color = {color},
+                            .index = 0,
+                            }} }}.data(), 1 }}
+                    }}");
+                    Declaration::Var(Var {
+                        ty: "inline slint::cbindgen_private::types::StaticTextures".into(),
+                        name: format!("slint_embedded_resource_{}", er.id),
+                        array_size: None,
+                        init: Some(init),
+                    })
+                },
+                crate::embedded_resources::EmbeddedResourcesKind::BitmapFontData(_) => {
+                    // FIXME! TODO
+                    Declaration::Var(Var {
+                        ty: "inline int".into(),
+                        name: format!("slint_embedded_resource_{}", er.id),
+                        array_size: None,
+                        init: Some("0".into()),
+                    })
+                }
+
             }
         },
     ));
@@ -2203,7 +2242,9 @@ fn compile_expression(expr: &llr::Expression, ctx: &EvaluationContext) -> String
                     let symbol = format!("slint_embedded_resource_{}", resource_id);
                     format!(r#"slint::private_api::load_image_from_embedded_data({symbol}, "{}")"#, escape_string(extension))
                 }
-                crate::expression_tree::ImageReference::EmbeddedTexture{..} => todo!(),
+                crate::expression_tree::ImageReference::EmbeddedTexture{resource_id} => {
+                    format!("slint::private_api::image_from_embedded_textures(&slint_embedded_resource_{resource_id})")
+                },
             }
         }
         Expression::Condition { condition, true_expr, false_expr } => {
@@ -2472,7 +2513,8 @@ fn compile_builtin_function_call(
             }
         }
         BuiltinFunction::RegisterBitmapFont => {
-            todo!()
+            // TODO
+            "/*TODO: REGISTER FONT*/".into()
         }
         BuiltinFunction::ImplicitLayoutInfo(orient) => {
             if let [llr::Expression::PropertyReference(pr)] = arguments {

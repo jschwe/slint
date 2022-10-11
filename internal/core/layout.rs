@@ -856,6 +856,7 @@ pub(crate) mod ffi {
         super::box_layout_info_ortho(cells, padding)
     }
 
+    #[cfg(feature = "std")]
     #[no_mangle]
     pub extern "C" fn slint_solve_path_layout(
         data: &PathLayoutData,

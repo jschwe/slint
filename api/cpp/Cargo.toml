@@ -18,29 +18,27 @@ links = "slint_cpp"
 
 [lib]
 path = "lib.rs"
-crate-type = ["lib", "cdylib"]
+crate-type = ["staticlib"]
 
 # Note, these features need to be kept in sync (along with their defaults) in
 # the C++ crate's CMakeLists.txt
 [features]
-interpreter = ["slint-interpreter"]
-testing = ["i-slint-backend-testing"] # Enable some function used by the integration tests
-
-backend-qt = ["i-slint-backend-selector/i-slint-backend-qt"]
-backend-winit = ["i-slint-backend-selector/backend-winit"]
-backend-winit-x11 = ["i-slint-backend-selector/backend-winit-x11"]
-backend-winit-wayland = ["i-slint-backend-selector/backend-winit-wayland"]
-renderer-winit-femtovg = ["i-slint-backend-selector/renderer-winit-femtovg"]
-renderer-winit-skia = ["i-slint-backend-selector/renderer-winit-skia"]
-renderer-winit-skia-opengl = ["i-slint-backend-selector/renderer-winit-skia-opengl"]
-
-default = ["backend-winit", "renderer-winit-femtovg", "backend-qt"]
+#interpreter = ["slint-interpreter"]
+#testing = ["i-slint-backend-testing"] # Enable some function used by the integration tests
+#
+#backend-qt = ["i-slint-backend-selector/i-slint-backend-qt"]
+#backend-winit = ["i-slint-backend-selector/backend-winit"]
+#backend-winit-x11 = ["i-slint-backend-selector/backend-winit-x11"]
+#backend-winit-wayland = ["i-slint-backend-selector/backend-winit-wayland"]
+#renderer-winit-femtovg = ["i-slint-backend-selector/renderer-winit-femtovg"]
+#renderer-winit-skia = ["i-slint-backend-selector/renderer-winit-skia"]
+#renderer-winit-skia-opengl = ["i-slint-backend-selector/renderer-winit-skia-opengl"]
+#
 
 [dependencies]
-i-slint-backend-selector = { version = "=0.3.1", path="../../internal/backends/selector" }
-i-slint-backend-testing = { version = "=0.3.1", path="../../internal/backends/testing", optional = true }
-i-slint-core = { version = "=0.3.1", path="../../internal/core", features = ["ffi"] }
-slint-interpreter = { version = "=0.3.1", path="../../internal/interpreter", default-features = false, features = ["ffi", "compat-0-3-0"], optional = true }
+i-slint-core = { version = "=0.3.1", path="../../internal/core", default-features = false, features = ["ffi", "unsafe-single-threaded"] }
+mcu-board-support = {path="../../examples/mcu-board-support",features=["pico-st7789"]}
+
 
 [build-dependencies]
 anyhow = "1.0"

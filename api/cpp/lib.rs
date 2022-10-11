@@ -3,16 +3,20 @@
 
 /*! This crate just expose the function used by the C++ integration */
 
+#![no_std]
+
+extern crate alloc;
+
+use alloc::rc::Rc;
 use core::ffi::c_void;
 use i_slint_core::window::{ffi::WindowAdapterRcOpaque, WindowAdapter};
-use std::rc::Rc;
 
 #[doc(hidden)]
 #[cold]
 pub fn use_modules() -> usize {
     #[cfg(feature = "slint-interpreter")]
     slint_interpreter::use_modules();
-    i_slint_backend_selector::use_modules();
+    //i_slint_backend_selector::use_modules();
     i_slint_core::use_modules()
 }
 
@@ -22,13 +26,13 @@ pub unsafe extern "C" fn slint_windowrc_init(out: *mut WindowAdapterRcOpaque) {
         core::mem::size_of::<Rc<dyn WindowAdapter>>(),
         core::mem::size_of::<WindowAdapterRcOpaque>()
     );
-    let win = i_slint_backend_selector::with_platform(|b| b.create_window_adapter());
+    let win = i_slint_core::with_platform(|| panic!("no backend"), |b| b.create_window_adapter());
     core::ptr::write(out as *mut Rc<dyn WindowAdapter>, win);
 }
 
 #[no_mangle]
 pub unsafe extern "C" fn slint_run_event_loop() {
-    i_slint_backend_selector::with_platform(|b| b.run_event_loop());
+    i_slint_core::with_platform(|| panic!("no backend"), |b| b.run_event_loop());
 }
 
 /// Will execute the given functor in the main thread
@@ -63,7 +67,7 @@ pub unsafe extern "C" fn slint_post_event(
 pub unsafe extern "C" fn slint_quit_event_loop() {
     i_slint_core::api::quit_event_loop().unwrap();
 }
-
+/*
 #[no_mangle]
 pub unsafe extern "C" fn slint_register_font_from_path(
     win: *const WindowAdapterRcOpaque,
@@ -95,10 +99,15 @@ pub unsafe extern "C" fn slint_register_font_from_data(
             Err(err) => err.to_string().into(),
         },
     )
-}
+}*/
 
 #[cfg(feature = "testing")]
 #[no_mangle]
 pub unsafe extern "C" fn slint_testing_init_backend() {
     i_slint_backend_testing::init();
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn slint_backend_init() {
+    mcu_board_support::init();
 }

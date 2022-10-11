@@ -16,7 +16,7 @@ include(CTest)
 
 add_subdirectory(api/cpp/)
 
-option(SLINT_BUILD_EXAMPLES "Build Slint Examples" OFF)
+option(SLINT_BUILD_EXAMPLES "Build Slint Examples" ON)
 add_feature_info(SLINT_BUILD_EXAMPLES SLINT_BUILD_EXAMPLES "configure whether to build the examples")
 
 if(SLINT_BUILD_EXAMPLES)
@@ -25,7 +25,7 @@ if(SLINT_BUILD_EXAMPLES)
     if (WIN32)
         set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
     endif()
-    add_subdirectory(examples)
+    add_subdirectory(examples/printerdemo_mcu)
     if(BUILD_TESTING)
         add_subdirectory(docs/tutorial/cpp/src/)
     endif()

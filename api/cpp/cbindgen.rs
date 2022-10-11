@@ -201,6 +201,7 @@ fn gen_corelib(
         "slint_image_path",
         "slint_image_load_from_path",
         "slint_image_load_from_embedded_data",
+        "slint_image_from_embedded_textures",
         "Coord",
     ]
     .iter()
@@ -267,6 +268,7 @@ fn gen_corelib(
                 "slint_image_path",
                 "slint_image_load_from_path",
                 "slint_image_load_from_embedded_data",
+                "slint_image_from_embedded_textures",
                 "SharedPixelBuffer",
                 "SharedImageBuffer",
                 "StaticTextures",
@@ -326,6 +328,7 @@ fn gen_corelib(
             "slint_image_path",
             "slint_image_load_from_path",
             "slint_image_load_from_embedded_data",
+            "slint_image_from_embedded_textures",
         ]
         .iter()
         .filter(|exclusion| !rust_types.iter().any(|inclusion| inclusion == *exclusion))
@@ -652,6 +655,8 @@ pub fn gen_all(root_dir: &Path, include_dir: &Path) -> anyhow::Result<Vec<PathBu
     gen_backend_qt(root_dir, include_dir, &mut deps)?;
     gen_backend_selector(root_dir, include_dir, &mut deps)?;
     gen_backend(root_dir, include_dir, &mut deps)?;
-    gen_interpreter(root_dir, include_dir, &mut deps)?;
+    if std::env::var("CARGO_FEATURE_interpreter").is_ok() {
+        gen_interpreter(root_dir, include_dir, &mut deps)?;
+    }
     Ok(deps)
 }
