@@ -11,12 +11,12 @@
 #include <vector>
 #include <memory>
 #include <algorithm>
-#include <iostream> // FIXME: remove: iostream always bring it lots of code so we should not have it in this header
+//#include <iostream> // FIXME: remove: iostream always bring it lots of code so we should not have it in this header
 #include <chrono>
 #include <optional>
-#include <thread>
-#include <mutex>
-#include <condition_variable>
+//#include <thread>
+//#include <mutex>
+//#include <condition_variable>
 #include <span>
 #include <functional>
 
@@ -73,7 +73,7 @@ using cbindgen_private::StandardListViewItem;
 inline void assert_main_thread()
 {
 #ifndef NDEBUG
-    static auto main_thread_id = std::this_thread::get_id();
+/*    static auto main_thread_id = std::this_thread::get_id();
     if (main_thread_id != std::this_thread::get_id()) {
         std::cerr << "A function that should be only called from the main thread was called from a "
                      "thread."
@@ -83,6 +83,7 @@ inline void assert_main_thread()
                   << std::endl;
         std::abort();
     }
+    */
 #endif
 }
 
@@ -647,7 +648,7 @@ public:
     /// If the model can update the data, it should also call `row_changed`
     virtual void set_row_data(int, const ModelData &)
     {
-        std::cerr << "Model::set_row_data was called on a read-only model" << std::endl;
+        //std::cerr << "Model::set_row_data was called on a read-only model" << std::endl;
     };
 
     /// \private
@@ -1340,7 +1341,7 @@ public:
                 return index;
             }
         }
-        return std::numeric_limits<uint64_t>::max();
+        return std::numeric_limits<uintptr_t>::max();
     }
 
     vtable::VRef<private_api::ComponentVTable> item_at(int i) const
@@ -1488,6 +1489,7 @@ void invoke_from_event_loop(Functor f)
             [](void *data) { delete reinterpret_cast<Functor *>(data); });
 }
 
+/*
 /// Blocking version of invoke_from_event_loop()
 ///
 /// Just like invoke_from_event_loop(), this will run the specified functor from the thread running
@@ -1557,5 +1559,6 @@ auto blocking_invoke_from_event_loop(Functor f) -> void
     std::unique_lock lock(mtx);
     cv.wait(lock, [&] { return ok; });
 }
+*/
 
 } // namespace slint

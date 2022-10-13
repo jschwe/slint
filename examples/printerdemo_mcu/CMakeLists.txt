@@ -10,5 +10,5 @@ if (NOT TARGET Slint::Slint)
 endif()
 
 add_executable(printerdemo_mcu main.cpp)
-target_link_libraries(printerdemo_mcu PRIVATE Slint::Slint)
+target_link_libraries(printerdemo_mcu PRIVATE Slint::Slint pico_stdlib)
 slint_target_sources(printerdemo_mcu ./ui/printerdemo.slint)
