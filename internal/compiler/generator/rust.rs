@@ -2132,6 +2132,9 @@ fn compile_builtin_function_call(
                 slint::private_unstable_api::re_exports::Color::from_argb_u8(a, r, g, b)
             })
         }
+        BuiltinFunction::MapPointToWindow => {
+            todo!()
+        }
     }
 }
 

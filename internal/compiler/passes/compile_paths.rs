@@ -134,15 +134,7 @@ fn compile_path_from_string_literal(
     let path = builder.build();
 
     let event_enum = crate::typeregister::BUILTIN_ENUMS.with(|e| e.PathEvent.clone());
-    let point_type = Type::Struct {
-        fields: IntoIterator::into_iter([
-            ("x".to_owned(), Type::Float32),
-            ("y".to_owned(), Type::Float32),
-        ])
-        .collect(),
-        name: Some("Point".into()),
-        node: None,
-    };
+    let point_type = crate::typeregister::point_type();
 
     let mut points = Vec::new();
     let events = path

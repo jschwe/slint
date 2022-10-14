@@ -7,6 +7,7 @@ use core::convert::TryInto;
 use core::pin::Pin;
 use corelib::graphics::{GradientStop, LinearGradientBrush, PathElement, RadialGradientBrush};
 use corelib::items::{ItemRef, PropertyAnimation};
+use corelib::lengths::LogicalPoint;
 use corelib::model::{Model, ModelRc};
 use corelib::rtti::AnimatedBindingKind;
 use corelib::window::WindowInner;
@@ -455,6 +456,42 @@ pub fn eval_expression(expression: &Expression, local_context: &mut EvalLocalCon
                     item_ref.as_ref().layout_info(crate::eval_layout::to_runtime(*orient), window_adapter).into()
                 } else {
                     panic!("internal error: incorrect arguments to ImplicitLayoutInfo {:?}", arguments);
+                }
+            }
+            Expression::BuiltinFunctionReference(BuiltinFunction::MapPointToWindow, _) => {
+                if arguments.len() != 2 {
+                    panic!("internal error: incorrect argument count to MapPointToWindow")
+                }
+
+                let component = match  local_context.component_instance  {
+                    ComponentInstance::InstanceRef(c) => c,
+                    ComponentInstance::GlobalComponent(_) => panic!("Cannot access the implicit item size from a global component")
+                };
+
+                if let Expression::ElementReference(item) = &arguments[0] {
+                    generativity::make_guard!(guard);
+
+                    let item = item.upgrade().unwrap();
+                    let enclosing_component =
+                        enclosing_component_for_element(&item, component, guard);
+                    let component_type = enclosing_component.component_type;
+
+                    let item_info = &component_type.items[item.borrow().id.as_str()];
+
+                    let item_comp = enclosing_component.self_weak().get().unwrap().upgrade().unwrap();
+
+                    let item_rc = corelib::items::ItemRc::new(vtable::VRc::into_dyn(item_comp), item_info.item_index());
+
+                    let point_value = eval_expression(&arguments[1], local_context);
+                    let point_struct: Struct = point_value.try_into().unwrap();
+                    let x: f64 = point_struct.get_field("x").unwrap().clone().try_into().unwrap();
+                    let y: f64 = point_struct.get_field("y").unwrap().clone().try_into().unwrap();
+                    let relative_point = LogicalPoint::new(x as _, y as _);
+                    let absolute_point= item_rc.map_to_window(relative_point);
+                    
+                    Value::Struct([("x".to_string(), absolute_point.x.try_into().unwrap()),( "y".to_string(), absolute_point.y.try_into().unwrap())].into_iter().collect())
+                } else {
+                    panic!("internal error: argument to SetFocusItem must be an element")
                 }
             }
             Expression::BuiltinFunctionReference(BuiltinFunction::RegisterCustomFontByPath, _) => {

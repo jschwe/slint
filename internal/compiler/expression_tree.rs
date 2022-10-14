@@ -46,6 +46,7 @@ pub enum BuiltinFunction {
     ArrayLength,
     Rgb,
     ImplicitLayoutInfo(Orientation),
+    MapPointToWindow,
     RegisterCustomFontByPath,
     RegisterCustomFontByMemory,
     RegisterBitmapFont,
@@ -150,6 +151,13 @@ impl BuiltinFunction {
                 return_type: Box::new(Type::Color),
                 args: vec![Type::Int32, Type::Int32, Type::Int32, Type::Float32],
             },
+            BuiltinFunction::MapPointToWindow => {
+                let point = crate::typeregister::point_type();
+                Type::Function {
+                    return_type: Box::new(point.clone()),
+                    args: vec![Type::ElementReference, point],
+                }
+            }
             BuiltinFunction::RegisterCustomFontByPath => {
                 Type::Function { return_type: Box::new(Type::Void), args: vec![Type::String] }
             }
@@ -198,6 +206,7 @@ impl BuiltinFunction {
             BuiltinFunction::ArrayLength => true,
             BuiltinFunction::Rgb => true,
             BuiltinFunction::ImplicitLayoutInfo(_) => false,
+            BuiltinFunction::MapPointToWindow => false,
             BuiltinFunction::RegisterCustomFontByPath
             | BuiltinFunction::RegisterCustomFontByMemory
             | BuiltinFunction::RegisterBitmapFont => false,

@@ -2451,6 +2451,9 @@ fn compile_builtin_function_call(
                 panic!("internal error: invalid args to ShowPopupWindow {:?}", arguments)
             }
         }
+        BuiltinFunction::MapPointToWindow => {
+            todo!()
+        }
         BuiltinFunction::RegisterCustomFontByPath => {
             if let [llr::Expression::StringLiteral(path)] = arguments {
                 let window = access_window_field(ctx);

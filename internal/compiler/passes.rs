@@ -1,6 +1,7 @@
 // Copyright © SixtyFPS GmbH <info@slint-ui.com>
 // SPDX-License-Identifier: GPL-3.0-only OR LicenseRef-Slint-commercial
 
+mod absolute_coordinates;
 mod apply_default_properties_from_style;
 mod binding_analysis;
 mod check_aliases;
@@ -127,6 +128,7 @@ pub async fn run_passes(
         lower_popups::lower_popups(component, &doc.local_registry, diag);
         lower_layout::lower_layouts(component, type_loader, diag).await;
         default_geometry::default_geometry(component, diag);
+        absolute_coordinates::lower_absolute_coordinates(component);
         z_order::reorder_by_z_order(component, diag);
         lower_property_to_element::lower_property_to_element(
             component,
