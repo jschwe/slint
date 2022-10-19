@@ -448,18 +448,20 @@ impl Window {
                 });
             }
             WindowEvent::PointerExited => self.0.process_mouse_input(MouseEvent::Exit),
-            WindowEvent::KeyPressed { modifiers, text } => self.0.process_key_input(&KeyEvent {
-                modifiers,
-                text,
-                event_type: KeyEventType::KeyPressed,
-                ..Default::default()
-            }),
-            WindowEvent::KeyReleased { modifiers, text } => self.0.process_key_input(&KeyEvent {
-                modifiers,
-                text,
-                event_type: KeyEventType::KeyReleased,
-                ..Default::default()
-            }),
+        //     WindowEvent::KeyPressed { modifiers, text } => self.0.process_key_input(&KeyEvent {
+        //         modifiers,
+        //         text,
+        //         event_type: KeyEventType::KeyPressed,
+        //         ..Default::default()
+        //     }),
+        //     WindowEvent::KeyReleased { modifiers, text } => self.0.process_key_input(&KeyEvent {
+        //         modifiers,
+        //         text,
+        //         event_type: KeyEventType::KeyReleased,
+        //         ..Default::default()
+            
+        //     }
+        // ),
         }
     }
 
@@ -470,8 +472,9 @@ impl Window {
     }
 }
 
-pub use crate::input::{KeyboardModifiers, PointerEventButton, key_codes};
+pub use crate::input::{PointerEventButton};
 pub use crate::SharedString;
+use crate::input::{KeyboardModifiers, key_codes};
 
 /// A event that describes user input.
 ///
@@ -483,7 +486,7 @@ pub use crate::SharedString;
 ///
 /// All position fields are in logical window coordinates.
 #[allow(missing_docs)]
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Copy, Clone, PartialEq)]
 #[non_exhaustive]
 pub enum WindowEvent {
     /// A pointer was pressed.
@@ -510,20 +513,20 @@ pub enum WindowEvent {
     },
     /// The pointer exited the window.
     PointerExited,
-    /// A key was pressed.
-    KeyPressed {
-        /// The keyboard modifiers active at the time of the key press event.
-        modifiers: KeyboardModifiers,
-        /// The unicode representation of the key pressed.
-        text: SharedString,
-    },
-    /// A key was pressed.
-    KeyReleased {
-        /// The keyboard modifiers active at the time of the key release event.
-        modifiers: KeyboardModifiers,
-        /// The unicode representation of the key released.
-        text: SharedString,
-    },
+    // /// A key was pressed.
+    // KeyPressed {
+    //     /// The keyboard modifiers active at the time of the key press event.
+    //     modifiers: KeyboardModifiers,
+    //     /// The unicode representation of the key pressed.
+    //     text: SharedString,
+    // },
+    // /// A key was pressed.
+    // KeyReleased {
+    //     /// The keyboard modifiers active at the time of the key release event.
+    //     modifiers: KeyboardModifiers,
+    //     /// The unicode representation of the key released.
+    //     text: SharedString,
+    // },
 }
 
 impl WindowEvent {
