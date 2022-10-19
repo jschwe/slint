@@ -68,26 +68,6 @@ impl MouseEvent {
     }
 }
 
-impl From<crate::api::WindowEvent> for MouseEvent {
-    fn from(event: crate::api::WindowEvent) -> Self {
-        match event {
-            crate::api::WindowEvent::PointerPressed { position, button } => {
-                MouseEvent::Pressed { position: position.to_euclid().cast(), button }
-            }
-            crate::api::WindowEvent::PointerReleased { position, button } => {
-                MouseEvent::Released { position: position.to_euclid().cast(), button }
-            }
-            crate::api::WindowEvent::PointerMoved { position } => {
-                MouseEvent::Moved { position: position.to_euclid().cast() }
-            }
-            crate::api::WindowEvent::PointerScrolled { position, delta_x, delta_y } => {
-                MouseEvent::Wheel { position: position.to_euclid().cast(), delta_x, delta_y }
-            }
-            crate::api::WindowEvent::PointerExited => MouseEvent::Exit,
-        }
-    }
-}
-
 /// This value is returned by the `input_event` function of an Item
 /// to notify the run-time about how the event was handled and
 /// what the next steps are.

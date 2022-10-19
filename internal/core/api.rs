@@ -10,6 +10,7 @@ This module contains types that are public and re-exported in the slint-rs as we
 use alloc::boxed::Box;
 
 use crate::component::ComponentVTable;
+use crate::input::{KeyEvent, KeyEventType, MouseEvent};
 use crate::window::{WindowAdapter, WindowInner};
 
 /// A position represented in the coordinate space of logical pixels. That is the space before applying
@@ -421,7 +422,44 @@ impl Window {
     /// Any position fields in the event must be in the logical pixel coordinate system relative to
     /// the top left corner of the window.
     pub fn dispatch_event(&self, event: WindowEvent) {
-        self.0.process_mouse_input(event.into())
+        match event {
+            WindowEvent::PointerPressed { position, button } => {
+                self.0.process_mouse_input(MouseEvent::Pressed {
+                    position: position.to_euclid().cast(),
+                    button,
+                });
+            }
+            WindowEvent::PointerReleased { position, button } => {
+                self.0.process_mouse_input(MouseEvent::Released {
+                    position: position.to_euclid().cast(),
+                    button,
+                });
+            }
+            WindowEvent::PointerMoved { position } => {
+                self.0.process_mouse_input(MouseEvent::Moved {
+                    position: position.to_euclid().cast(),
+                });
+            }
+            WindowEvent::PointerScrolled { position, delta_x, delta_y } => {
+                self.0.process_mouse_input(MouseEvent::Wheel {
+                    position: position.to_euclid().cast(),
+                    delta_x,
+                    delta_y,
+                });
+            }
+            WindowEvent::PointerExited => self.0.process_mouse_input(MouseEvent::Exit),
+            WindowEvent::KeyPressed { modifiers, text } => self.0.process_key_input(&KeyEvent {
+                modifiers,
+                text,
+                event_type: KeyEventType::KeyPressed,
+                ..Default::default()
+            }),
+            WindowEvent::KeyReleased { text } => self.0.process_key_input(&KeyEvent {
+                text,
+                event_type: KeyEventType::KeyReleased,
+                ..Default::default()
+            }),
+        }
     }
 
     /// Returns true if there is an animation currently active on any property in the Window; false otherwise.
@@ -431,7 +469,8 @@ impl Window {
     }
 }
 
-pub use crate::input::PointerEventButton;
+pub use crate::input::{KeyboardModifiers, PointerEventButton};
+pub use crate::SharedString;
 
 /// A event that describes user input.
 ///
@@ -443,7 +482,7 @@ pub use crate::input::PointerEventButton;
 ///
 /// All position fields are in logical window coordinates.
 #[allow(missing_docs)]
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, PartialEq)]
 #[non_exhaustive]
 pub enum WindowEvent {
     /// A pointer was pressed.
@@ -470,6 +509,18 @@ pub enum WindowEvent {
     },
     /// The pointer exited the window.
     PointerExited,
+    /// A key was pressed.
+    KeyPressed {
+        /// The keyboard modifiers active at the time of the key press event.
+        modifiers: KeyboardModifiers,
+        /// The unicode representation of the key pressed.
+        text: SharedString,
+    },
+    /// A key was pressed.
+    KeyReleased {
+        /// The unicode representation of the key pressed.
+        text: SharedString,
+    },
 }
 
 impl WindowEvent {
@@ -480,7 +531,7 @@ impl WindowEvent {
             WindowEvent::PointerReleased { position, .. } => Some(*position),
             WindowEvent::PointerMoved { position } => Some(*position),
             WindowEvent::PointerScrolled { position, .. } => Some(*position),
-            WindowEvent::PointerExited => None,
+            _ => None,
         }
     }
 }
