@@ -13,9 +13,6 @@ use crate::component::ComponentVTable;
 use crate::input::{KeyEvent, KeyEventType, MouseEvent};
 use crate::window::{WindowAdapter, WindowInner};
 
-/// Exports the key_codes ot the api.
-pub use crate::input::key_codes;
-
 /// A position represented in the coordinate space of logical pixels. That is the space before applying
 /// a display device specific scale factor.
 #[derive(Debug, Default, Copy, Clone, PartialEq)]
@@ -473,7 +470,7 @@ impl Window {
     }
 }
 
-pub use crate::input::{KeyboardModifiers, PointerEventButton};
+pub use crate::input::{KeyboardModifiers, PointerEventButton, key_codes};
 pub use crate::SharedString;
 
 /// A event that describes user input.
