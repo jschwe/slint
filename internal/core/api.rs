@@ -13,6 +13,9 @@ use crate::component::ComponentVTable;
 use crate::input::{KeyEvent, KeyEventType, MouseEvent};
 use crate::window::{WindowAdapter, WindowInner};
 
+/// Exports the key_codes ot the api.
+pub use crate::input::key_codes;
+
 /// A position represented in the coordinate space of logical pixels. That is the space before applying
 /// a display device specific scale factor.
 #[derive(Debug, Default, Copy, Clone, PartialEq)]
@@ -454,7 +457,8 @@ impl Window {
                 event_type: KeyEventType::KeyPressed,
                 ..Default::default()
             }),
-            WindowEvent::KeyReleased { text } => self.0.process_key_input(&KeyEvent {
+            WindowEvent::KeyReleased { modifiers, text } => self.0.process_key_input(&KeyEvent {
+                modifiers,
                 text,
                 event_type: KeyEventType::KeyReleased,
                 ..Default::default()
@@ -518,7 +522,9 @@ pub enum WindowEvent {
     },
     /// A key was pressed.
     KeyReleased {
-        /// The unicode representation of the key pressed.
+        /// The keyboard modifiers active at the time of the key release event.
+        modifiers: KeyboardModifiers,
+        /// The unicode representation of the key released.
         text: SharedString,
     },
 }
