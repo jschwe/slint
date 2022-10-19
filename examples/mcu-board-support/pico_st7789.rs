@@ -221,7 +221,7 @@ impl slint::platform::Platform for PicoBackend {
                             .map(|position| WindowEvent::PointerReleased { position, button })
                     })
                 {
-                    window.dispatch_event(event);
+                    window.dispatch_event(event.clone());
 
                     // removes hover state on widgets
                     if matches!(event, WindowEvent::PointerReleased { .. }) {
