@@ -450,13 +450,13 @@ impl Window {
             WindowEvent::PointerExited => self.0.process_mouse_input(MouseEvent::Exit),
             WindowEvent::KeyPressed { modifiers, text } => self.0.process_key_input(&KeyEvent {
                 modifiers,
-                text: SharedString::from(text.encode_utf8(&mut [0; 6]) as &str),
+                text: SharedString::from(text),
                 event_type: KeyEventType::KeyPressed,
                 ..Default::default()
             }),
             WindowEvent::KeyReleased { modifiers, text } => self.0.process_key_input(&KeyEvent {
                 modifiers,
-                text: SharedString::from(text.encode_utf8(&mut [0; 6]) as &str),
+                text: SharedString::from(text),
                 event_type: KeyEventType::KeyReleased,
                 ..Default::default()
             }),
