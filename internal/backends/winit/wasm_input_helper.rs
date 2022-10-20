@@ -214,10 +214,7 @@ fn event_text(e: &web_sys::KeyboardEvent) -> Option<SharedString> {
 
     let key = e.key();
 
-    let convert = |char: char| {
-        let mut buffer = [0; 6];
-        Some(SharedString::from(char.encode_utf8(&mut buffer) as &str))
-    };
+    let convert = |char: char| Some(SharedString::from(char));
 
     macro_rules! check_non_printable_code {
         ($($char:literal # $name:ident # $($_qt:ident)|* # $($_winit:ident)|* ;)*) => {

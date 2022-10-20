@@ -225,8 +225,7 @@ mod key_codes {
                     $($(winit::event::VirtualKeyCode::$winit => $char,)*)*
                     _ => return None,
                 };
-                let mut buffer = [0; 6];
-                Some(i_slint_core::SharedString::from(char.encode_utf8(&mut buffer) as &str))
+                Some(i_slint_core::SharedString::from(char))
             }
         };
     }
@@ -279,7 +278,7 @@ fn process_window_event(
                     .and_then(winit_key_code_to_string)
                     .filter(|key_text| !key_text.starts_with(char::is_control))
             } else {
-                Some(ch.to_string().into())
+                Some(SharedString::from(ch))
             };
 
             let text = match text {

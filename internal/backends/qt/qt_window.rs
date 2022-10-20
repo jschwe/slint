@@ -2006,8 +2006,7 @@ mod key_codes {
                     $($(key_generated::$qt => $char,)*)*
                     _ => return None,
                 };
-                let mut buffer = [0; 6];
-                Some(i_slint_core::SharedString::from(char.encode_utf8(&mut buffer) as &str))
+                Some(i_slint_core::SharedString::from(char))
             }
         };
     }
