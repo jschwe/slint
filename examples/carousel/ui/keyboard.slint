@@ -4,8 +4,16 @@ export Keyboard := Rectangle {
     callback closed(string);
 
     VerticalLayout {  
+        Text {  
+            text  <=> root.text;
+        }
         Rectangle { 
             background: blue;
+
+            Text {
+                text: "a";
+                color: white;
+            }
 
             TouchArea {  
                 clicked => { text += "a"; }
@@ -14,6 +22,11 @@ export Keyboard := Rectangle {
 
          Rectangle { 
             background: green;
+
+            Text {
+                text: "enter"; 
+                color: white;
+            }
 
             TouchArea {  
                 clicked => { closed(text); }
