@@ -1,0 +1,40 @@
+import { Keyboard } from "keyboard.slint";
+
+KeyboardViewLayout := Rectangle {
+    property <bool> keyboard-open: false;
+    property <string> prop: "";
+    property <string> text: "";
+
+    callback text-update(string, string);
+
+    if(!keyboard-open) : Rectangle {
+        @children
+    }
+
+    if(keyboard-open) : Keyboard {
+        text: root.text;
+        closed(text) => {  
+            text-update(prop, text);
+        }
+    }
+}
+
+export KeyboardView := Rectangle {
+
+    callback open-keyboard(string, string);
+    callback text-update(string, string);
+
+    open-keyboard(prop, text) => {  
+        layout.prop = prop;
+        layout.text = text;
+        layout.keyboard-open = true;
+    }
+
+    layout := KeyboardViewLayout {
+        text-update(prop, text) => {  
+            root.text-update(prop, text);
+            keyboard-open = false;
+        }
+        @children
+    }
+}
