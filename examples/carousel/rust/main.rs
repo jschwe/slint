@@ -27,7 +27,11 @@ pub fn main() {
 #[mcu_board_support::entry]
 fn main() -> ! {
     mcu_board_support::init();
-    MainWindow::new().run();
+    let main_window = MainWindow::new();
+
+    // main_window.on
+
+    main_window.run();
 
     panic!("The MCU demo should not quit")
 }
