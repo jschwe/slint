@@ -225,7 +225,7 @@ mod key_codes {
                     $($(winit::event::VirtualKeyCode::$winit => $char,)*)*
                     _ => return None,
                 };
-                Some(i_slint_core::SharedString::from(char))
+                Some(char.into())
             }
         };
     }

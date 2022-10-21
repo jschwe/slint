@@ -214,7 +214,7 @@ fn event_text(e: &web_sys::KeyboardEvent) -> Option<SharedString> {
 
     let key = e.key();
 
-    let convert = |char: char| Some(SharedString::from(char));
+    let convert = |char: char| Some(char.into());
 
     macro_rules! check_non_printable_code {
         ($($char:literal # $name:ident # $($_qt:ident)|* # $($_winit:ident)|* ;)*) => {

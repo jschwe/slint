@@ -263,6 +263,7 @@ fn simple_test() {
         &*std::ffi::CString::new("hello world!").unwrap()
     );
     assert_eq!(SharedString::from('h'), "h");
+    assert_eq!(SharedString::from('😎'), "😎");
 }
 
 #[test]

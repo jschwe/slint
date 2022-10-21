@@ -2006,7 +2006,7 @@ mod key_codes {
                     $($(key_generated::$qt => $char,)*)*
                     _ => return None,
                 };
-                Some(i_slint_core::SharedString::from(char))
+                Some(char.into())
             }
         };
     }
