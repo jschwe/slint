@@ -1,0 +1,122 @@
+export global KeyboardManager := {
+    // callback open-keyboard(string) -> string;
+    callback update-text(int, string);
+    callback fake-key-event(string);
+
+    property <string> current-text: "";
+
+    property<[string]> texts: [];
+    property<int> counter: -1;
+
+    callback get-id() -> int;
+
+    callback get-text() -> string;
+
+    callback open-keyboard(int) -> int;
+
+    callback get-text(bool, string) -> string;
+
+    get-id => { 
+        debug("test " + counter);     
+        counter += 1;
+        texts[counter] = "";
+        counter
+     }
+
+    open-keyboard(id) => {  
+        if(id > 0) {
+            id
+        }
+
+        debug("test " + counter);
+        counter += 1;
+        counter
+    }
+
+    // get-text(index) => {
+    //     texts[index]
+    // }
+
+    fake-key-event(text) => {  }
+
+    property <bool> closed: false;
+}
+
+
+export Keyboard := Rectangle {
+    background: blue;
+
+    TouchArea {  
+        clicked => { KeyboardManager.fake-key-event("a"); }
+    }
+}
+
+export InputHelper := Rectangle {
+
+}
+
+export TestKeyboard := Rectangle {
+    background: black;
+}
+
+export MagicTextInput := Rectangle {
+    width: 200px;
+    height: 32px;
+    background: lightblue;
+
+    property<bool> keyboard-open: false;
+    property<string> text: "";
+
+    // property <int> id: KeyboardManager.get-id();
+    // property <string> text: KeyboardManager.get-text(id);
+
+    // inner := Text {
+    //     text: if(keyboard-open )  text : ""
+    //     // text: KeyboardManager.get-text(id);
+    // }
+
+    // if (keyboard-open) : InputHelper {  
+    //     property <string> internal-text: KeyboardManager.current-text;
+
+    //     states [ 
+    //         close when KeyboardManager.closed : {
+    //             text: internal-text;
+    //             KeyboardManager.closed: false;
+    //         }
+    //      ]
+    // }
+
+    TouchArea { 
+        clicked => {
+            keyboard-open = true;
+        }
+     }
+    
+
+    // callback update-text <=> KeyboardManager.update-text;
+
+    // property <string> text: "test";
+
+    // TouchArea {  
+    //     clicked => { text = KeyboardManager.open-keyboard(text); }
+    // }
+    // property <string> virtual-text: "";
+    // text: KeyboardManager.update-text(virtual-text);
+}
+
+export KeyboardWindow := Window {
+    callback key-enter(string);
+
+    // key-enter(text) => {
+    //     keyboard.key-enter(text);
+    // }
+
+    VerticalLayout {  
+        @children
+        keyboard := Keyboard {  
+        
+        }
+    }
+
+   
+}

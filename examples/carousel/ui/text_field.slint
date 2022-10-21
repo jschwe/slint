@@ -1,0 +1,18 @@
+export TextField := Rectangle {
+    callback open-keyboard <=> touch.clicked;
+
+    property <string> text;
+    background: white;
+
+    width: 120px;
+    height: 32px;
+
+    Text {
+        color: black;
+        text <=> root.text;
+    }
+
+    touch := TouchArea {  
+       
+    }
+}

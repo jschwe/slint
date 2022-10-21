@@ -1,0 +1,68 @@
+import { TextField } from "text_field.slint";
+import { Keyboard } from "keyboard.slint";
+
+export global SettingsAdapter := {
+   
+    property <string> user-name: "name";
+    property <string> password: "password";
+
+   
+
+   
+
+   
+}
+
+export SettingsView := Rectangle {
+    property <string> edit-text: "";
+    property <string> edit-property-name: "";
+    property <bool> keyboard-open: false;
+    property <string> prop-name: "";
+
+    callback open-keyboard(string, string);
+
+    open-keyboard(name, text) => {  
+        keyboard-open = true;
+        prop-name = name;
+        edit-text = text;
+    }
+
+
+
+    if(!keyboard-open) : VerticalLayout {  
+        width: 100%;
+        height: 100%;
+        spacing: 3px;
+
+        TextField { 
+            text <=> SettingsAdapter.user-name;
+
+            open-keyboard => {  
+                root.open-keyboard("user-name", text);
+            }
+         }
+
+         TextField { 
+            text <=> SettingsAdapter.password;
+            open-keyboard => {  
+                root.open-keyboard("password", text);
+            }
+         }
+    }
+
+    if(keyboard-open) : Keyboard {
+        text <=> edit-text;
+
+        closed => {  
+            if(prop-name == "user-name") {
+                SettingsAdapter.user-name = text;
+            }
+
+            if(prop-name == "password") {
+                SettingsAdapter.password = text;
+            }
+
+            keyboard-open = false;
+        }
+    }
+}

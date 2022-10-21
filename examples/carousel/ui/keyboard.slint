@@ -1,0 +1,23 @@
+export Keyboard := Rectangle {
+    property<string> text: "text";
+
+    callback closed(string);
+
+    VerticalLayout {  
+        Rectangle { 
+            background: blue;
+
+            TouchArea {  
+                clicked => { text += "a"; }
+            }
+         }
+
+         Rectangle { 
+            background: green;
+
+            TouchArea {  
+                clicked => { closed(text); }
+            }
+         }
+    }
+}
