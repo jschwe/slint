@@ -131,6 +131,28 @@ pub mod key_codes {
     macro_rules! declare_consts_for_special_keys {
        ($($char:literal # $name:ident # $($_qt:ident)|* # $($_winit:ident)|* ;)*) => {
             $(pub const $name : char = $char;)*
+
+            /// A keyboard key 
+            pub enum Key {  
+                /// The given key is unknown.
+                Unknown,
+                $($name,)*
+            }
+
+            impl Default for Key {
+                fn default() -> Self {
+                    Self::Unknown
+                }
+            }
+
+            impl From<char> for Key {
+                fn from(c: char) -> Self {
+                    match c {
+                        $($name => Self::$name,)*
+                        _ => Self::default()
+                    }
+                }
+            }
         };
     }
 
