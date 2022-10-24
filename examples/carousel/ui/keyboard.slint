@@ -1,36 +1,117 @@
+export struct Key := {
+    text: string
+}
+
+export struct KeyRow := {
+    keys: [Key]
+}
+
+KeyButton := TouchArea {
+    property<string> text: "A";
+
+    width: 32px;
+    height: 32px;
+
+    background := Rectangle {  
+        background: white;
+        border-radius: 4px;
+
+        text := Text {  
+            width: 100%;
+            height: 100%;
+            vertical-alignment: center;
+            horizontal-alignment: center;
+            color: black;
+            text: root.text;
+        }
+    }
+
+    states [
+        pressend when root.pressed : {
+            background.background: black;
+            text.color: white;
+        }
+    ]
+}
+
 export Keyboard := Rectangle {
     property<string> text: "text";
+    property<bool> shift: false;
+
+    property<[[{ l: string, u: string }]]> rows : [ 
+        [ 
+            { l: "q", u : "Q" },
+            { l: "w", u : "W" },
+            { l: "e", u : "E" },
+            { l: "r", u : "R" },
+            { l: "t", u : "T" },
+            { l: "y", u : "Y" },
+            { l: "u", u : "U" },
+            { l: "i", u : "I" },
+            { l: "o", u : "O" },
+            { l: "p", u : "P" },
+        ],
+        [ 
+            { l: "a", u : "A" },
+            { l: "s", u : "S" },
+            { l: "d", u : "D" },
+            { l: "g", u : "G" },
+            { l: "h", u : "H" },
+            { l: "j", u : "J" },
+            { l: "k", u : "K" },
+            { l: "l", u : "L" },
+        ],
+        [ 
+            { l: "z", u : "Z" },
+            { l: "x", u : "X" },
+            { l: "c", u : "C" },
+            { l: "v", u : "V" },
+            { l: "b", u : "B" },
+            { l: "n", u : "N" },
+            { l: "m", u : "M" },
+        ]  
+    ];
 
     callback closed(string);
 
+    callback key-text(bool, string, string) -> string;
+    
     VerticalLayout {  
+        spacing: 4px;
+
         Text {  
             text  <=> root.text;
+            horizontal-alignment: center;
         }
-        Rectangle { 
-            background: blue;
 
-            Text {
-                text: "a";
-                color: white;
+        for row in rows :  HorizontalLayout {
+            spacing: 4px;
+            alignment: center;
+           
+            for key in row : KeyButton{
+                text:  key.l;
+                clicked => { root.text += text; }
+
+                states [
+                    shift when root.shift : {
+                        text: key.u;
+                    }
+                ]
             }
+        }
 
-            TouchArea {  
-                clicked => { text += "a"; }
+        HorizontalLayout { 
+            spacing: 4px;
+            alignment: center;
+
+            KeyButton {
+                text: "SH";
+                clicked => { shift = !shift; }
             }
-         }
-
-         Rectangle { 
-            background: green;
-
-            Text {
-                text: "enter"; 
-                color: white;
+            KeyButton {
+                text: "DO";
+                clicked => { closed(root.text); }
             }
-
-            TouchArea {  
-                clicked => { closed(text); }
-            }
-         }
+        }
     }
 }
