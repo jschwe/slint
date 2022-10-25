@@ -20,7 +20,7 @@
 use std::cell::RefCell;
 use std::rc::{Rc, Weak};
 
-use i_slint_core::input::{KeyInputEvent, KeyEventType};
+use i_slint_core::input::{KeyEventType, KeyInputEvent};
 use i_slint_core::window::{WindowAdapter, WindowInner};
 use i_slint_core::SharedString;
 use wasm_bindgen::closure::Closure;
