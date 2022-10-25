@@ -205,10 +205,7 @@ public:
     }
     /// Returns an iterator that when compared with an iterator returned by begin() can be
     /// used to detect when all fields have been visited.
-    iterator end() const
-    {
-        return iterator();
-    }
+    iterator end() const { return iterator(); }
 
     /// Returns the value of the field with the given \a name; Returns an std::optional without
     /// value if the field does not exist.
@@ -1004,6 +1001,17 @@ public:
 namespace slint::testing {
 
 using cbindgen_private::KeyboardModifiers;
+
+/// Send a key events to the given component instance
+inline void send_key_event(const slint::interpreter::ComponentInstance *component, slint::Key key,
+                           bool pressed)
+{
+    const cbindgen_private::WindowAdapterRcOpaque *win_ptr = nullptr;
+    cbindgen_private::slint_interpreter_component_instance_window(
+            reinterpret_cast<const cbindgen_private::ErasedComponentBox *>(component), &win_ptr);
+    cbindgen_private::send_key_event(
+            key, pressed, reinterpret_cast<const cbindgen_private::WindowAdapterRc *>(win_ptr));
+}
 
 /// Send a key events to the given component instance
 inline void send_keyboard_string_sequence(const slint::interpreter::ComponentInstance *component,
