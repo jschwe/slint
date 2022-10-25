@@ -134,14 +134,14 @@ pub mod key_codes {
 
             /// A keyboard key 
             pub enum Key {  
-                /// The given key is unknown.
-                Unknown,
+                /// A key that cannot be mapped.
+                Undefined,
                 $($name,)*
             }
 
             impl Default for Key {
                 fn default() -> Self {
-                    Self::Unknown
+                    Self::Undefined
                 }
             }
 
@@ -420,8 +420,75 @@ pub struct MouseInputState {
     delayed: Option<(crate::timers::Timer, MouseEvent)>,
 }
 
-pub struct Modifiers {
-    
+
+/// The state which a window should hold for keyboard modifiers
+#[derive(Default)]
+pub struct ModifiersState {
+    alt: bool,
+    alt_graph: bool,
+    caps_lock: bool,
+    control: bool,
+    fn_key: bool,
+    fn_lock: bool,
+    hyper: bool,
+    meta: bool,
+    num_lock: bool,
+    scroll_lock: bool,
+    shift: bool,
+    symbol: bool,
+    symbol_lock: bool,  
+}
+
+impl KeyboardModifierState {
+    fn update(&mut self, pressed: bool, key: key_codes::Key) {
+        match key {
+            key_codes::Key::Unknown => todo!(),
+            key_codes::Key::Backspace => todo!(),
+            key_codes::Key::Tab => todo!(),
+            key_codes::Key::Return => todo!(),
+            key_codes::Key::Escape => todo!(),
+            key_codes::Key::Backtab => todo!(),
+            key_codes::Key::Delete => todo!(),
+            key_codes::Key::UpArrow => todo!(),
+            key_codes::Key::DownArrow => todo!(),
+            key_codes::Key::LeftArrow => todo!(),
+            key_codes::Key::RightArrow => todo!(),
+            key_codes::Key::F1 => todo!(),
+            key_codes::Key::F2 => todo!(),
+            key_codes::Key::F3 => todo!(),
+            key_codes::Key::F4 => todo!(),
+            key_codes::Key::F5 => todo!(),
+            key_codes::Key::F6 => todo!(),
+            key_codes::Key::F7 => todo!(),
+            key_codes::Key::F8 => todo!(),
+            key_codes::Key::F9 => todo!(),
+            key_codes::Key::F10 => todo!(),
+            key_codes::Key::F11 => todo!(),
+            key_codes::Key::F12 => todo!(),
+            key_codes::Key::F13 => todo!(),
+            key_codes::Key::F14 => todo!(),
+            key_codes::Key::F15 => todo!(),
+            key_codes::Key::F16 => todo!(),
+            key_codes::Key::F17 => todo!(),
+            key_codes::Key::F18 => todo!(),
+            key_codes::Key::F19 => todo!(),
+            key_codes::Key::F20 => todo!(),
+            key_codes::Key::F21 => todo!(),
+            key_codes::Key::F22 => todo!(),
+            key_codes::Key::F23 => todo!(),
+            key_codes::Key::F24 => todo!(),
+            key_codes::Key::Insert => todo!(),
+            key_codes::Key::Home => todo!(),
+            key_codes::Key::End => todo!(),
+            key_codes::Key::PageUp => todo!(),
+            key_codes::Key::PageDown => todo!(),
+            key_codes::Key::ScrollLock => todo!(),
+            key_codes::Key::Pause => todo!(),
+            key_codes::Key::SysReq => todo!(),
+            key_codes::Key::Stop => todo!(),
+            key_codes::Key::Menu => todo!(),
+        }
+    }
 }
 
 /// Try to handle the mouse grabber. Return true if the event has handled, or false otherwise

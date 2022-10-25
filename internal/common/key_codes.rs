@@ -90,6 +90,7 @@ macro_rules! for_each_special_keys {
 //'\u{F745}'	# Find        # Qt_Key_Key_Find         #              ;
 //'\u{F746}'	# Help        # Qt_Key_Key_Help         #              ;
 //'\u{F747}'	# ModeSwitch  # Qt_Key_Key_Mode_switch  #            ;
+
 ];
     };
 }
