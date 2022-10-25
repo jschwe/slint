@@ -5,7 +5,7 @@
 #![warn(missing_docs)]
 #![allow(unsafe_code)]
 
-use crate::input::{KeyEvent, KeyEventType, KeyboardModifiers, MouseEvent};
+use crate::input::{key_codes::Key, KeyEventType, KeyInputEvent, MouseEvent};
 use crate::window::WindowInner;
 use crate::Coord;
 use crate::SharedString;
@@ -61,26 +61,26 @@ pub extern "C" fn slint_send_mouse_click(
 #[no_mangle]
 pub extern "C" fn send_keyboard_string_sequence(
     sequence: &crate::SharedString,
-    modifiers: KeyboardModifiers,
     window_adapter: &crate::window::WindowAdapterRc,
 ) {
     for ch in sequence.chars() {
-        let mut modifiers = modifiers;
         if ch.is_ascii_uppercase() {
-            modifiers.shift = true;
+            WindowInner::from_pub(window_adapter.window()).process_key_input(KeyInputEvent {
+                event_type: KeyEventType::KeyPressed,
+                text: char::from(Key::Shift).into(),
+                ..Default::default()
+            });
         }
         let text = SharedString::from(ch);
 
-        WindowInner::from_pub(window_adapter.window()).process_key_input(&KeyEvent {
+        WindowInner::from_pub(window_adapter.window()).process_key_input(KeyInputEvent {
             event_type: KeyEventType::KeyPressed,
             text: text.clone(),
-            modifiers,
             ..Default::default()
         });
-        WindowInner::from_pub(window_adapter.window()).process_key_input(&KeyEvent {
+        WindowInner::from_pub(window_adapter.window()).process_key_input(KeyInputEvent {
             event_type: KeyEventType::KeyReleased,
             text,
-            modifiers,
             ..Default::default()
         });
     }

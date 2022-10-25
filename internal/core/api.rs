@@ -10,8 +10,11 @@ This module contains types that are public and re-exported in the slint-rs as we
 use alloc::boxed::Box;
 
 use crate::component::ComponentVTable;
-use crate::input::{KeyEvent, KeyEventType, MouseEvent};
+use crate::input::{KeyEventType, KeyInputEvent, MouseEvent};
 use crate::window::{WindowAdapter, WindowInner};
+
+// reexport key enum to the public api
+pub use crate::input::key_codes::Key;
 
 /// A position represented in the coordinate space of logical pixels. That is the space before applying
 /// a display device specific scale factor.
@@ -448,14 +451,13 @@ impl Window {
                 });
             }
             WindowEvent::PointerExited => self.0.process_mouse_input(MouseEvent::Exit),
-            WindowEvent::KeyPressed { modifiers, text } => self.0.process_key_input(&KeyEvent {
-                modifiers,
+
+            WindowEvent::KeyPressed { text } => self.0.process_key_input(KeyInputEvent {
                 text: SharedString::from(text),
                 event_type: KeyEventType::KeyPressed,
                 ..Default::default()
             }),
-            WindowEvent::KeyReleased { modifiers, text } => self.0.process_key_input(&KeyEvent {
-                modifiers,
+            WindowEvent::KeyReleased { text } => self.0.process_key_input(KeyInputEvent {
                 text: SharedString::from(text),
                 event_type: KeyEventType::KeyReleased,
                 ..Default::default()
@@ -470,7 +472,7 @@ impl Window {
     }
 }
 
-pub use crate::input::{key_codes, KeyboardModifiers, PointerEventButton};
+pub use crate::input::{key_codes, PointerEventButton};
 pub use crate::SharedString;
 
 /// A event that describes user input.

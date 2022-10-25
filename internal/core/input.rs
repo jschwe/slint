@@ -132,24 +132,28 @@ pub mod key_codes {
        ($($char:literal # $name:ident # $($_qt:ident)|* # $($_winit:ident)|* ;)*) => {
             $(pub const $name : char = $char;)*
 
-            /// A keyboard key 
-            pub enum Key {  
-                /// A key that cannot be mapped.
-                Undefined,
+            #[allow(missing_docs)]
+            #[derive(Debug, Copy, Clone, PartialEq)]
+            #[non_exhaustive]
+            /// A keyboard key
+            pub enum Key {
                 $($name,)*
             }
 
-            impl Default for Key {
-                fn default() -> Self {
-                    Self::Undefined
-                }
-            }
 
             impl From<char> for Key {
                 fn from(c: char) -> Self {
                     match c {
                         $($name => Self::$name,)*
-                        _ => Self::default()
+                        _ => todo!()
+                    }
+                }
+            }
+
+            impl From<Key> for char {
+                fn from(k: Key) -> Self {
+                    match k {
+                        $(Key::$name => $name,)*
                     }
                 }
             }
@@ -170,12 +174,35 @@ pub mod key_codes {
 pub struct KeyboardModifiers {
     /// Indicates the alt key on a keyboard.
     pub alt: bool,
+    /// Indicates the alt_gr key on a keyboard.
+    pub alt_gr: bool,
+    /// Indicates the caps_lock key on a keyboard.
+    pub caps_lock: bool,
     /// Indicates the control key on a keyboard.
     pub control: bool,
     /// Indicates the logo key on macOS and the windows key on Windows.
     pub meta: bool,
     /// Indicates the shift key on a keyboard.
     pub shift: bool,
+}
+
+impl KeyboardModifiers {
+    /// Updates a flag of the modifiers if the key of the given text is pressed.
+    pub fn state_update(mut self, pressed: bool, text: &SharedString) -> Self {
+        if let Some(key_code) = text.chars().next() {
+            match key_code {
+                key_codes::Alt => self.alt = pressed,
+                key_codes::AltGr => self.alt_gr = pressed,
+                key_codes::CapsLock => self.caps_lock = pressed,
+                key_codes::Control => self.control = pressed,
+                key_codes::Shift => self.shift = pressed,
+                key_codes::Home => self.meta = pressed,
+                _ => {}
+            };
+        }
+
+        self
+    }
 }
 
 /// This enum defines the different kinds of key events that can happen.
@@ -199,12 +226,41 @@ impl Default for KeyEventType {
     }
 }
 
+impl From<bool> for KeyEventType {
+    fn from(b: bool) -> Self {
+        match b {
+            true => KeyEventType::KeyPressed,
+            false => KeyEventType::KeyReleased,
+        }
+    }
+}
+
 /// Represents a key event sent by the windowing system.
+#[derive(Debug, Clone, PartialEq, Default)]
+#[repr(C)]
+pub struct KeyInputEvent {
+    /// The unicode representation of the key pressed.
+    pub text: SharedString,
+
+    // note: this field is not exported in the .slint in the KeyEvent builtin struct
+    /// Indicates whether the key was pressed or released
+    pub event_type: KeyEventType,
+
+    /// If the event type is KeyEventType::UpdateComposition, then this field specifies
+    /// the start of the selection as byte offsets within the preedit text.
+    pub preedit_selection_start: usize,
+    /// If the event type is KeyEventType::UpdateComposition, then this field specifies
+    /// the end of the selection as byte offsets within the preedit text.
+    pub preedit_selection_end: usize,
+}
+
+/// Represents a key event.
 #[derive(Debug, Clone, PartialEq, Default)]
 #[repr(C)]
 pub struct KeyEvent {
     /// The keyboard modifiers active at the time of the key press event.
     pub modifiers: KeyboardModifiers,
+
     /// The unicode representation of the key pressed.
     pub text: SharedString,
 
@@ -418,77 +474,6 @@ pub struct MouseInputState {
     /// true if the top item of the stack has the mouse grab
     grabbed: bool,
     delayed: Option<(crate::timers::Timer, MouseEvent)>,
-}
-
-
-/// The state which a window should hold for keyboard modifiers
-#[derive(Default)]
-pub struct ModifiersState {
-    alt: bool,
-    alt_graph: bool,
-    caps_lock: bool,
-    control: bool,
-    fn_key: bool,
-    fn_lock: bool,
-    hyper: bool,
-    meta: bool,
-    num_lock: bool,
-    scroll_lock: bool,
-    shift: bool,
-    symbol: bool,
-    symbol_lock: bool,  
-}
-
-impl KeyboardModifierState {
-    fn update(&mut self, pressed: bool, key: key_codes::Key) {
-        match key {
-            key_codes::Key::Unknown => todo!(),
-            key_codes::Key::Backspace => todo!(),
-            key_codes::Key::Tab => todo!(),
-            key_codes::Key::Return => todo!(),
-            key_codes::Key::Escape => todo!(),
-            key_codes::Key::Backtab => todo!(),
-            key_codes::Key::Delete => todo!(),
-            key_codes::Key::UpArrow => todo!(),
-            key_codes::Key::DownArrow => todo!(),
-            key_codes::Key::LeftArrow => todo!(),
-            key_codes::Key::RightArrow => todo!(),
-            key_codes::Key::F1 => todo!(),
-            key_codes::Key::F2 => todo!(),
-            key_codes::Key::F3 => todo!(),
-            key_codes::Key::F4 => todo!(),
-            key_codes::Key::F5 => todo!(),
-            key_codes::Key::F6 => todo!(),
-            key_codes::Key::F7 => todo!(),
-            key_codes::Key::F8 => todo!(),
-            key_codes::Key::F9 => todo!(),
-            key_codes::Key::F10 => todo!(),
-            key_codes::Key::F11 => todo!(),
-            key_codes::Key::F12 => todo!(),
-            key_codes::Key::F13 => todo!(),
-            key_codes::Key::F14 => todo!(),
-            key_codes::Key::F15 => todo!(),
-            key_codes::Key::F16 => todo!(),
-            key_codes::Key::F17 => todo!(),
-            key_codes::Key::F18 => todo!(),
-            key_codes::Key::F19 => todo!(),
-            key_codes::Key::F20 => todo!(),
-            key_codes::Key::F21 => todo!(),
-            key_codes::Key::F22 => todo!(),
-            key_codes::Key::F23 => todo!(),
-            key_codes::Key::F24 => todo!(),
-            key_codes::Key::Insert => todo!(),
-            key_codes::Key::Home => todo!(),
-            key_codes::Key::End => todo!(),
-            key_codes::Key::PageUp => todo!(),
-            key_codes::Key::PageDown => todo!(),
-            key_codes::Key::ScrollLock => todo!(),
-            key_codes::Key::Pause => todo!(),
-            key_codes::Key::SysReq => todo!(),
-            key_codes::Key::Stop => todo!(),
-            key_codes::Key::Menu => todo!(),
-        }
-    }
 }
 
 /// Try to handle the mouse grabber. Return true if the event has handled, or false otherwise

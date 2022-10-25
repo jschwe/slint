@@ -11,11 +11,12 @@ use copypasta::ClipboardProvider;
 use corelib::items::PointerEventButton;
 use corelib::lengths::LogicalPoint;
 use corelib::lengths::LogicalSize;
+use glutin::event::ModifiersState;
 use i_slint_core as corelib;
 
 use corelib::api::EventLoopError;
 use corelib::graphics::euclid;
-use corelib::input::{KeyEvent, KeyEventType, KeyboardModifiers, MouseEvent};
+use corelib::input::{key_codes::Key, KeyEventType, KeyInputEvent, KeyboardModifiers, MouseEvent};
 use corelib::window::*;
 use corelib::{Coord, SharedString};
 use std::cell::{Cell, RefCell, RefMut};
@@ -30,7 +31,6 @@ pub(crate) static QUIT_ON_LAST_WINDOW_CLOSED: std::sync::atomic::AtomicBool =
 
 pub trait WinitWindow: WindowAdapter {
     fn currently_pressed_key_code(&self) -> &Cell<Option<winit::event::VirtualKeyCode>>;
-    fn current_keyboard_modifiers(&self) -> &Cell<KeyboardModifiers>;
     /// Returns true if during the drawing request_redraw() was called.
     fn draw(&self) -> bool;
     fn with_window_handle(&self, callback: &mut dyn FnMut(&winit::window::Window));
@@ -190,6 +190,55 @@ fn window_by_id(id: winit::window::WindowId) -> Option<Rc<dyn WinitWindow>> {
     ALL_WINDOWS.with(|windows| windows.borrow().get(&id).and_then(|weakref| weakref.upgrade()))
 }
 
+fn process_modifier_events(
+    runtime_window: &WindowInner,
+    current_modifiers: &mut KeyboardModifiers,
+    state: ModifiersState,
+) {
+    // To provide an easier cross-platform behavior, we map the command key to control
+    // on macOS, and control to meta.
+    #[cfg(target_os = "macos")]
+    let (control, meta) = (state.logo(), state.ctrl());
+    #[cfg(not(target_os = "macos"))]
+    let (control, meta) = (state.ctrl(), state.logo());
+
+    if state.shift() != current_modifiers.shift {
+        runtime_window.process_key_input(KeyInputEvent {
+            text: char::from(Key::Shift).into(),
+            event_type: KeyEventType::from(state.shift()),
+            ..Default::default()
+        });
+        current_modifiers.shift = state.shift();
+    }
+
+    if state.alt() != current_modifiers.alt {
+        runtime_window.process_key_input(KeyInputEvent {
+            text: char::from(Key::Alt).into(),
+            event_type: KeyEventType::from(state.alt()),
+            ..Default::default()
+        });
+        current_modifiers.alt = state.alt();
+    }
+
+    if control != current_modifiers.control {
+        runtime_window.process_key_input(KeyInputEvent {
+            text: char::from(Key::Control).into(),
+            event_type: KeyEventType::from(control),
+            ..Default::default()
+        });
+        current_modifiers.control = control;
+    }
+
+    if meta != current_modifiers.meta {
+        runtime_window.process_key_input(KeyInputEvent {
+            text: char::from(Key::Home).into(),
+            event_type: KeyEventType::from(meta),
+            ..Default::default()
+        });
+        current_modifiers.meta = meta;
+    }
+}
+
 /// This enum captures run-time specific events that can be dispatched to the event loop in
 /// addition to the winit events.
 pub enum CustomEvent {
@@ -237,24 +286,8 @@ fn process_window_event(
     event: WindowEvent,
     cursor_pos: &mut LogicalPoint,
     pressed: &mut bool,
+    modifiers_state: &mut KeyboardModifiers,
 ) {
-    fn key_event(
-        event_type: KeyEventType,
-        text: SharedString,
-        modifiers: KeyboardModifiers,
-    ) -> KeyEvent {
-        let mut event = KeyEvent { event_type, text, modifiers, ..Default::default() };
-
-        let tab = String::from(corelib::input::key_codes::Tab);
-
-        // map Shift-Tab into (Shift) Backtab to have a similar behavior as Qt backend
-        if event.text == tab && modifiers.shift {
-            event.text = SharedString::from(String::from(corelib::input::key_codes::Backtab));
-        }
-
-        event
-    }
-
     let runtime_window = WindowInner::from_pub(window.window());
     match event {
         WindowEvent::Resized(size) => {
@@ -286,13 +319,16 @@ fn process_window_event(
                 None => return,
             };
 
-            let modifiers = window.current_keyboard_modifiers().get();
-
-            let mut event = key_event(KeyEventType::KeyPressed, text, modifiers);
-
-            runtime_window.process_key_input(&event);
-            event.event_type = KeyEventType::KeyReleased;
-            runtime_window.process_key_input(&event);
+            runtime_window.process_key_input(KeyInputEvent {
+                event_type: KeyEventType::KeyPressed,
+                text: text.clone(),
+                ..Default::default()
+            });
+            runtime_window.process_key_input(KeyInputEvent {
+                event_type: KeyEventType::KeyReleased,
+                text: text.clone(),
+                ..Default::default()
+            });
         }
         WindowEvent::Focused(have_focus) => {
             let have_focus = have_focus || window.input_method_focused();
@@ -310,57 +346,45 @@ fn process_window_event(
             });
             if let Some(text) = input.virtual_keycode.and_then(key_codes::winit_key_to_string) {
                 #[allow(unused_mut)]
-                let mut modifiers = window.current_keyboard_modifiers().get();
+                // let mut modifiers = window.current_keyboard_modifiers().get();
                 // On wasm, the WindowEvent::ModifiersChanged event is not received
                 #[cfg(target_arch = "wasm32")]
                 #[allow(deprecated)]
                 {
-                    modifiers.shift |= input.modifiers.shift();
-                    modifiers.control |= input.modifiers.ctrl();
-                    modifiers.meta |= input.modifiers.logo();
-                    modifiers.alt |= input.modifiers.alt();
+                    process_modifier_events(runtime_window, modifiers_state, input.modifiers);
                 }
 
-                let event = key_event(
-                    match input.state {
+                runtime_window.process_key_input(KeyInputEvent {
+                    event_type: match input.state {
                         winit::event::ElementState::Pressed => KeyEventType::KeyPressed,
                         winit::event::ElementState::Released => KeyEventType::KeyReleased,
                     },
                     text,
-                    modifiers,
-                );
-                runtime_window.process_key_input(&event);
+                    ..Default::default()
+                });
             };
         }
         WindowEvent::Ime(winit::event::Ime::Preedit(string, preedit_selection)) => {
             let preedit_selection = preedit_selection.unwrap_or((0, 0));
-            let event = KeyEvent {
+            let event = KeyInputEvent {
                 event_type: KeyEventType::UpdateComposition,
                 text: string.into(),
                 preedit_selection_start: preedit_selection.0,
                 preedit_selection_end: preedit_selection.1,
                 ..Default::default()
             };
-            runtime_window.process_key_input(&event);
+            runtime_window.process_key_input(event);
         }
         WindowEvent::Ime(winit::event::Ime::Commit(string)) => {
-            let event = KeyEvent {
+            let event = KeyInputEvent {
                 event_type: KeyEventType::CommitComposition,
                 text: string.into(),
                 ..Default::default()
             };
-            runtime_window.process_key_input(&event);
+            runtime_window.process_key_input(event);
         }
         WindowEvent::ModifiersChanged(state) => {
-            // To provide an easier cross-platform behavior, we map the command key to control
-            // on macOS, and control to meta.
-            #[cfg(target_os = "macos")]
-            let (control, meta) = (state.logo(), state.ctrl());
-            #[cfg(not(target_os = "macos"))]
-            let (control, meta) = (state.ctrl(), state.logo());
-            let modifiers =
-                KeyboardModifiers { shift: state.shift(), alt: state.alt(), control, meta };
-            window.current_keyboard_modifiers().set(modifiers);
+            process_modifier_events(runtime_window, modifiers_state, state)
         }
         WindowEvent::CursorMoved { position, .. } => {
             let position = position.to_logical(runtime_window.scale_factor() as f64);
@@ -479,11 +503,18 @@ pub fn run() {
     // last seen cursor position
     let mut cursor_pos = LogicalPoint::default();
     let mut pressed = false;
+    let mut modifiers_state = KeyboardModifiers::default();
 
     let mut run_fn = move |event: Event<CustomEvent>, control_flow: &mut ControlFlow| match event {
         Event::WindowEvent { event, window_id } => {
             if let Some(window) = window_by_id(window_id) {
-                process_window_event(window, event, &mut cursor_pos, &mut pressed);
+                process_window_event(
+                    window,
+                    event,
+                    &mut cursor_pos,
+                    &mut pressed,
+                    &mut modifiers_state,
+                );
             };
         }
 

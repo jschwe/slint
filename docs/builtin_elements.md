@@ -522,7 +522,7 @@ Example := Window {
             if (event.modifiers.control) {
                 debug("control was pressed during this event");
             }
-            if (event.text == Keys.Escape) {
+            if (event.text == Key.Escape) {
                 debug("Esc key was pressed")
             }
             accept
@@ -831,6 +831,11 @@ against the constants below.
 * **`Escape`**
 * **`Backtab`**
 * **`Delete`**
+* **`Shift`**
+* **`Control`**
+* **`Alt`**
+* **`AltGr`**
+* **`CapsLock`**
 * **`UpArrow`**
 * **`DownArrow`**
 * **`LeftArrow`**

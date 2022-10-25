@@ -257,7 +257,7 @@ macro_rules! declare_value_struct_conversion {
 
 declare_value_struct_conversion!(struct i_slint_core::model::StandardListViewItem { text });
 declare_value_struct_conversion!(struct i_slint_core::properties::StateInfo { current_state, previous_state, change_time });
-declare_value_struct_conversion!(struct i_slint_core::input::KeyboardModifiers { control, alt, shift, meta });
+declare_value_struct_conversion!(struct i_slint_core::input::KeyboardModifiers { control, alt, alt_gr, caps_lock, shift, meta });
 declare_value_struct_conversion!(struct i_slint_core::input::KeyEvent { text, modifiers, ..Default::default() });
 declare_value_struct_conversion!(struct i_slint_core::layout::LayoutInfo { min, max, min_percent, max_percent, preferred, stretch });
 declare_value_struct_conversion!(struct i_slint_core::graphics::Point { x, y, ..Default::default()});
@@ -1083,7 +1083,6 @@ pub mod testing {
     ) {
         i_slint_core::tests::send_keyboard_string_sequence(
             &string,
-            Default::default(),
             &WindowInner::from_pub(comp.window()).window_adapter(),
         );
     }
