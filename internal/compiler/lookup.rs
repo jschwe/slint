@@ -83,6 +83,7 @@ pub enum BuiltinNamespace {
     Colors,
     Math,
     Keys,
+    Key,
     SlintInternal,
 }
 
@@ -96,6 +97,7 @@ impl LookupResult {
     pub fn deprecated(&self) -> Option<&str> {
         match self {
             Self::Expression { deprecated: Some(x), .. } => Some(x.as_str()),
+            Self::Namespace(BuiltinNamespace::Keys) => Some("Key"),
             _ => None,
         }
     }
@@ -146,6 +148,7 @@ impl LookupObject for LookupResult {
             }
             LookupResult::Namespace(BuiltinNamespace::Math) => MathFunctions.for_each_entry(ctx, f),
             LookupResult::Namespace(BuiltinNamespace::Keys) => KeysLookup.for_each_entry(ctx, f),
+            LookupResult::Namespace(BuiltinNamespace::Key) => KeysLookup.for_each_entry(ctx, f),
             LookupResult::Namespace(BuiltinNamespace::SlintInternal) => {
                 SlintInternal.for_each_entry(ctx, f)
             }
@@ -161,6 +164,7 @@ impl LookupObject for LookupResult {
             }
             LookupResult::Namespace(BuiltinNamespace::Math) => MathFunctions.lookup(ctx, name),
             LookupResult::Namespace(BuiltinNamespace::Keys) => KeysLookup.lookup(ctx, name),
+            LookupResult::Namespace(BuiltinNamespace::Key) => KeysLookup.lookup(ctx, name),
             LookupResult::Namespace(BuiltinNamespace::SlintInternal) => {
                 SlintInternal.lookup(ctx, name)
             }
@@ -693,6 +697,7 @@ impl LookupObject for BuiltinNamespaceLookup {
         None.or_else(|| f("Colors", LookupResult::Namespace(BuiltinNamespace::Colors)))
             .or_else(|| f("Math", LookupResult::Namespace(BuiltinNamespace::Math)))
             .or_else(|| f("Keys", LookupResult::Namespace(BuiltinNamespace::Keys)))
+            .or_else(|| f("Key", LookupResult::Namespace(BuiltinNamespace::Key)))
             .or_else(|| {
                 f("SlintInternal", LookupResult::Namespace(BuiltinNamespace::SlintInternal))
             })

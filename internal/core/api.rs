@@ -512,16 +512,12 @@ pub enum WindowEvent {
     PointerExited,
     /// A key was pressed.
     KeyPressed {
-        /// The keyboard modifiers active at the time of the key press event.
-        modifiers: KeyboardModifiers,
         // FIXME: use SharedString instead of char (breaking change)
         /// The unicode representation of the key pressed.
         text: char,
     },
     /// A key was pressed.
     KeyReleased {
-        /// The keyboard modifiers active at the time of the key release event.
-        modifiers: KeyboardModifiers,
         // FIXME: use SharedString instead of char (breaking change)
         /// The unicode representation of the key released.
         text: char,

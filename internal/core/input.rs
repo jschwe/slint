@@ -420,6 +420,10 @@ pub struct MouseInputState {
     delayed: Option<(crate::timers::Timer, MouseEvent)>,
 }
 
+pub struct Modifiers {
+    
+}
+
 /// Try to handle the mouse grabber. Return true if the event has handled, or false otherwise
 fn handle_mouse_grab(
     mouse_event: &MouseEvent,
