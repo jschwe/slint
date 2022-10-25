@@ -20,7 +20,7 @@
 use std::cell::RefCell;
 use std::rc::{Rc, Weak};
 
-use i_slint_core::input::{KeyEvent, KeyEventType, KeyboardModifiers};
+use i_slint_core::input::{KeyInputEvent, KeyEventType};
 use i_slint_core::window::{WindowAdapter, WindowInner};
 use i_slint_core::SharedString;
 use wasm_bindgen::closure::Closure;
@@ -83,8 +83,7 @@ impl WasmInputHelper {
             if let (Some(window_adapter), Some(text)) = (win.upgrade(), event_text(&e)) {
                 e.prevent_default();
                 shared_state2.borrow_mut().has_key_down = true;
-                WindowInner::from_pub(window_adapter.window()).process_key_input(&KeyEvent {
-                    modifiers: modifiers(&e),
+                WindowInner::from_pub(window_adapter.window()).process_key_input(KeyInputEvent {
                     text,
                     event_type: KeyEventType::KeyPressed,
                     ..Default::default()
@@ -98,8 +97,7 @@ impl WasmInputHelper {
             if let (Some(window_adapter), Some(text)) = (win.upgrade(), event_text(&e)) {
                 e.prevent_default();
                 shared_state2.borrow_mut().has_key_down = false;
-                WindowInner::from_pub(window_adapter.window()).process_key_input(&KeyEvent {
-                    modifiers: modifiers(&e),
+                WindowInner::from_pub(window_adapter.window()).process_key_input(&KeyInputEvent {
                     text,
                     event_type: KeyEventType::KeyReleased,
                     ..Default::default()
@@ -238,14 +236,5 @@ fn event_text(e: &web_sys::KeyboardEvent) -> Option<SharedString> {
         Some(key.as_str().into())
     } else {
         None
-    }
-}
-
-fn modifiers(e: &web_sys::KeyboardEvent) -> KeyboardModifiers {
-    KeyboardModifiers {
-        alt: e.alt_key(),
-        control: e.ctrl_key(),
-        meta: e.meta_key(),
-        shift: e.shift_key(),
     }
 }

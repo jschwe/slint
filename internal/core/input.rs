@@ -135,6 +135,7 @@ pub mod key_codes {
             #[allow(missing_docs)]
             #[derive(Debug, Copy, Clone, PartialEq)]
             #[non_exhaustive]
+            #[repr(C)]
             /// A keyboard key
             pub enum Key {
                 $($name,)*

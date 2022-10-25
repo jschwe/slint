@@ -86,6 +86,20 @@ pub extern "C" fn send_keyboard_string_sequence(
     }
 }
 
+/// Simulate a character input event.
+#[no_mangle]
+pub extern "C" fn send_key_event(
+    key: crate::input::key_codes::Key,
+    pressed: bool,
+    window_adapter: &crate::window::WindowAdapterRc,
+) {
+    WindowInner::from_pub(window_adapter.window()).process_key_input(KeyInputEvent {
+        event_type: KeyEventType::from(pressed),
+        text: char::from(key).into(),
+        ..Default::default()
+    });
+}
+
 /// implementation details for debug_log()
 #[doc(hidden)]
 pub fn debug_log_impl(args: core::fmt::Arguments) {
