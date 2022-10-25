@@ -97,7 +97,7 @@ impl WasmInputHelper {
             if let (Some(window_adapter), Some(text)) = (win.upgrade(), event_text(&e)) {
                 e.prevent_default();
                 shared_state2.borrow_mut().has_key_down = false;
-                WindowInner::from_pub(window_adapter.window()).process_key_input(&KeyInputEvent {
+                WindowInner::from_pub(window_adapter.window()).process_key_input(KeyInputEvent {
                     text,
                     event_type: KeyEventType::KeyReleased,
                     ..Default::default()
@@ -114,12 +114,12 @@ impl WasmInputHelper {
                     if !shared_state2.borrow_mut().has_key_down {
                         let window_inner = WindowInner::from_pub(window_adapter.window());
                         let text = SharedString::from(data.as_str());
-                        window_inner.process_key_input(&KeyEvent {
+                        window_inner.process_key_input(KeyInputEvent {
                             text: text.clone(),
                             event_type: KeyEventType::KeyPressed,
                             ..Default::default()
                         });
-                        window_inner.process_key_input(&KeyEvent {
+                        window_inner.process_key_input(KeyInputEvent {
                             text,
                             event_type: KeyEventType::KeyReleased,
                             ..Default::default()
@@ -136,7 +136,7 @@ impl WasmInputHelper {
         h.add_event_listener("compositionend", move |e: web_sys::CompositionEvent| {
             if let (Some(window_adapter), Some(data)) = (win.upgrade(), e.data()) {
                 let window_inner = WindowInner::from_pub(window_adapter.window());
-                window_inner.process_key_input(&KeyEvent {
+                window_inner.process_key_input(KeyInputEvent {
                     text: data.into(),
                     event_type: KeyEventType::CommitComposition,
                     ..Default::default()
@@ -151,7 +151,7 @@ impl WasmInputHelper {
                 let window_inner = WindowInner::from_pub(window_adapter.window());
                 let text: SharedString = data.into();
                 let preedit_cursor_pos = text.len();
-                window_inner.process_key_input(&KeyEvent {
+                window_inner.process_key_input(KeyInputEvent {
                     text,
                     event_type: KeyEventType::UpdateComposition,
                     preedit_selection_start: preedit_cursor_pos,
