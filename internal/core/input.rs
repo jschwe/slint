@@ -141,21 +141,17 @@ pub mod key_codes {
                 $($name,)*
             }
 
-
-            impl From<char> for Key {
-                fn from(c: char) -> Self {
-                    match c {
-                        $($name => Self::$name,)*
-                        _ => todo!()
-                    }
-                }
-            }
-
             impl From<Key> for char {
                 fn from(k: Key) -> Self {
                     match k {
                         $(Key::$name => $name,)*
                     }
+                }
+            }
+
+            impl From<Key> for crate::SharedString {
+                fn from(k: Key) -> Self {
+                    char::from(k).into()
                 }
             }
         };

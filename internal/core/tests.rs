@@ -67,7 +67,7 @@ pub extern "C" fn send_keyboard_string_sequence(
         if ch.is_ascii_uppercase() {
             WindowInner::from_pub(window_adapter.window()).process_key_input(KeyInputEvent {
                 event_type: KeyEventType::KeyPressed,
-                text: char::from(Key::Shift).into(),
+                text: Key::Shift.into(),
                 ..Default::default()
             });
         }
