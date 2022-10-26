@@ -205,7 +205,10 @@ public:
     }
     /// Returns an iterator that when compared with an iterator returned by begin() can be
     /// used to detect when all fields have been visited.
-    iterator end() const { return iterator(); }
+    iterator end() const
+    {
+        return iterator();
+    }
 
     /// Returns the value of the field with the given \a name; Returns an std::optional without
     /// value if the field does not exist.
