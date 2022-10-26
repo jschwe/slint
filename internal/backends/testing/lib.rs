@@ -146,6 +146,22 @@ mod for_unit_test {
         );
     }
 
+    /// Simulate entering a sequence of ascii characters key by (pressed or released).
+    pub fn send_keyboard_string<
+        X: vtable::HasStaticVTable<i_slint_core::component::ComponentVTable>,
+        Component: Into<vtable::VRc<i_slint_core::component::ComponentVTable, X>> + ComponentHandle,
+    >(
+        component: &Component,
+        string: &SharedString,
+        pressed: bool,
+    ) {
+        i_slint_core::tests::send_keyboard_string(
+            string,
+            pressed,
+            &WindowInner::from_pub(component.window()).window_adapter(),
+        )
+    }
+
     /// Simulate entering a sequence of ascii characters key by key.
     pub fn send_keyboard_string_sequence<
         X: vtable::HasStaticVTable<i_slint_core::component::ComponentVTable>,
