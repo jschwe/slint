@@ -516,12 +516,24 @@ pub enum WindowEvent {
     KeyPressed {
         // FIXME: use SharedString instead of char (breaking change)
         /// The unicode representation of the key pressed.
+        ///
+        /// # Example
+        /// A specific key can be mapped to a unicode by using the `Key` enum
+        /// ```rust
+        /// let event = WindowEvent::KeyPressed(text: Key::Shift.into());
+        /// ```
         text: char,
     },
     /// A key was pressed.
     KeyReleased {
         // FIXME: use SharedString instead of char (breaking change)
         /// The unicode representation of the key released.
+        ///   ///
+        /// # Example
+        /// A specific key can be mapped to a unicode by using the `Key` enum
+        /// ```rust
+        /// let event = WindowEvent::KeyReleased(text: Key::Shift.into());
+        /// ```
         text: char,
     },
 }

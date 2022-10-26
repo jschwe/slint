@@ -136,8 +136,8 @@ pub mod key_codes {
             #[derive(Debug, Copy, Clone, PartialEq)]
             #[non_exhaustive]
             #[repr(C)]
-            /// The `Key` enum is used to map a specific key by name e.g. `Key::Control` to an 
-            /// internal used `char` code representation.
+            /// The `Key` enum is used to map a specific key by name e.g. `Key::Control` to an
+            /// internal used unicode representation.
             pub enum Key {
                 $($name,)*
             }
