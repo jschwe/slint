@@ -59,7 +59,6 @@ using ItemTreeNode = cbindgen_private::ItemTreeNode;
 using ItemArrayEntry =
         vtable::VOffset<uint8_t, slint::cbindgen_private::ItemVTable, vtable::AllowPin>;
 using ItemArray = slint::cbindgen_private::Slice<ItemArrayEntry>;
-using cbindgen_private::Key;
 using cbindgen_private::KeyboardModifiers;
 using cbindgen_private::KeyEvent;
 using cbindgen_private::PointerEvent;

@@ -24,9 +24,9 @@ inline void send_mouse_click(const Component *component, float x, float y)
 }
 
 template<typename Component>
-inline void send_key_event(const Component *component, slint::Key key, bool pressed)
+inline void send_keyboard_char(const Component *component, char ch, bool pressed)
 {
-    cbindgen_private::send_key_event(key, pressed, &component->m_window.window_handle());
+    cbindgen_private::send_keyboard_char(ch, pressed, &component->m_window.window_handle());
 }
 
 template<typename Component>

@@ -88,14 +88,14 @@ pub extern "C" fn send_keyboard_string_sequence(
 
 /// Simulate a character input event.
 #[no_mangle]
-pub extern "C" fn send_key_event(
-    key: crate::input::key_codes::Key,
+pub extern "C" fn send_keyboard_char(
+    ch: u32,
     pressed: bool,
     window_adapter: &crate::window::WindowAdapterRc,
 ) {
     WindowInner::from_pub(window_adapter.window()).process_key_input(KeyInputEvent {
         event_type: KeyEventType::from(pressed),
-        text: char::from(key).into(),
+        text: char::from_u32(ch).map_or_else(SharedString::default, |ch| ch.into()),
         ..Default::default()
     });
 }

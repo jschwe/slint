@@ -1076,14 +1076,10 @@ pub mod testing {
             &WindowInner::from_pub(comp.window()).window_adapter(),
         );
     }
-    /// Wrapper around [`i_slint_core::tests::send_key_event`]
-    pub fn send_key_event(
-        comp: &super::ComponentInstance,
-        key: i_slint_core::input::key_codes::Key,
-        pressed: bool,
-    ) {
-        i_slint_core::tests::send_key_event(
-            key,
+    /// Wrapper around [`i_slint_core::tests::send_keyboard_char`]
+    pub fn send_keyboard_char(comp: &super::ComponentInstance, ch: char, pressed: bool) {
+        i_slint_core::tests::send_keyboard_char(
+            ch as u32,
             pressed,
             &WindowInner::from_pub(comp.window()).window_adapter(),
         );
