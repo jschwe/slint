@@ -57,6 +57,20 @@ pub extern "C" fn slint_send_mouse_click(
     );
 }
 
+/// Simulate a character input event (pressed or released).
+#[no_mangle]
+pub extern "C" fn send_keyboard_string(
+    string: &crate::SharedString,
+    pressed: bool,
+    window_adapter: &crate::window::WindowAdapterRc,
+) {
+    WindowInner::from_pub(window_adapter.window()).process_key_input(KeyInputEvent {
+        event_type: KeyEventType::from(pressed),
+        text: string.clone(),
+        ..Default::default()
+    });
+}
+
 /// Simulate a character input event.
 #[no_mangle]
 pub extern "C" fn send_keyboard_string_sequence(
@@ -84,20 +98,6 @@ pub extern "C" fn send_keyboard_string_sequence(
             ..Default::default()
         });
     }
-}
-
-/// Simulate a character input event.
-#[no_mangle]
-pub extern "C" fn send_keyboard_char(
-    ch: u32,
-    pressed: bool,
-    window_adapter: &crate::window::WindowAdapterRc,
-) {
-    WindowInner::from_pub(window_adapter.window()).process_key_input(KeyInputEvent {
-        event_type: KeyEventType::from(pressed),
-        text: char::from_u32(ch).map_or_else(SharedString::default, |ch| ch.into()),
-        ..Default::default()
-    });
 }
 
 /// implementation details for debug_log()

@@ -47,9 +47,9 @@ slint_testing::send_keyboard_string_sequence(&instance, "Test");
 assert_eq!(instance.get_test_text(), "Test");
 assert!(!instance.get_has_selection());
 
-slint_testing::set_current_keyboard_modifiers(&instance, shift_modifier);
+  slint_testing::send_keyboard_string(&instance, slint::private_unstable_api::re_exports::Key::Shift.into(), true);
 slint_testing::send_keyboard_string_sequence(&instance, &LEFT_CODE.to_string());
-slint_testing::set_current_keyboard_modifiers(&instance, slint::private_unstable_api::re_exports::KeyboardModifiers::default());
+  slint_testing::send_keyboard_string(&instance, slint::private_unstable_api::re_exports::Key::Shift.into(), false);
 assert!(instance.get_has_selection());
 slint_testing::send_keyboard_string_sequence(&instance, &BACK_CODE.to_string());
 assert!(!instance.get_has_selection());

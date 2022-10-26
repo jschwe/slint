@@ -1003,14 +1003,14 @@ namespace slint::testing {
 using cbindgen_private::KeyboardModifiers;
 
 /// Send a key events to the given component instance
-inline void send_keyboard_char(const slint::interpreter::ComponentInstance *component, char ch,
-                               bool pressed)
+inline void send_keyboard_string(const slint::interpreter::ComponentInstance *component,
+                                 const slint::SharedString &str, bool pressed)
 {
     const cbindgen_private::WindowAdapterRcOpaque *win_ptr = nullptr;
     cbindgen_private::slint_interpreter_component_instance_window(
             reinterpret_cast<const cbindgen_private::ErasedComponentBox *>(component), &win_ptr);
-    cbindgen_private::send_keyboard_char(
-            ch, pressed, reinterpret_cast<const cbindgen_private::WindowAdapterRc *>(win_ptr));
+    cbindgen_private::send_keyboard_string(
+            &str, pressed, reinterpret_cast<const cbindgen_private::WindowAdapterRc *>(win_ptr));
 }
 
 /// Send a key events to the given component instance
