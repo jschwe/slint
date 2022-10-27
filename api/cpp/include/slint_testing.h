@@ -34,7 +34,7 @@ template<typename Component>
 inline void send_keyboard_string_sequence(const Component *component,
                                           const slint::SharedString &str)
 {
-    cbindgen_private::send_keyboard_string_sequence(&str, &component->m_window.window_handle());
+    cbindgen_private::send_keyboard_string_sequence(str, &component->m_window.window_handle());
 }
 
 #define assert_eq(A, B)                                                                            \
